@@ -1,0 +1,17 @@
+extends layout
+
+block content
+    .panel.panel-default
+        .panel-heading Device Selection
+        .panel-body
+                form(action='/connect', method='post')
+                    fieldset
+                        .form-group.row
+                            .col-sm-10     
+                                input.form-control(type='text', name='cs', placeholder=devcs) 
+                            .col-sm-2
+                                button.btn.btn-default(type='submit', name="action", value='connect') connect  
+
+
+
+        

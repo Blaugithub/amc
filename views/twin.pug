@@ -1,0 +1,58 @@
+extends layout
+
+block content
+        .panel.panel-default
+            .panel-heading Current Fields
+            .panel-body   
+                table.table.table-condensed
+                    thead
+                        tr
+                            th Type
+                            th Name                            
+                            th Value                            
+                    tbody
+                        each twin in twins
+                            tr
+                                td=twin.type
+                                td=twin.name
+                                td=twin.value
+     
+        .panel.panel-default
+            .panel-heading Add Field
+            .panel-body                                
+                form(action='/twin', method='post')
+                    fieldset
+                        .form-group.row
+                            .col-xs-12
+                                label Field Name
+                                input.form-control(name="name", type='text', placeholder="field name")
+                        .form-group.row                                
+                            .col-xs-12
+                                label Type
+                                input.form-control(name="type", type='text', placeholder="one of tag/property")
+                        br
+                        br                                 
+                        .form-group.row
+                            .col-sm-1
+                                button.btn.btn-space.btn-default(type='submit') +
+
+        .panel.panel-default
+            .panel-heading Update Twin
+            .panel-body                                
+                form(action='/update_twin', method='post')
+                    fieldset                  
+                        .form-group.row
+                            .col-xs-4
+                                label Field Name
+                                input.form-control(name="name", type='text', placeholder="one of 'Names' as in 'Current Fields' above")
+                            .col-xs-4
+                                label Field Type
+                                input.form-control(name="type", type='text', placeholder="tag or property")
+                            .col-xs-4
+                                label Field Value
+                                input.form-control(name="value", type='text', placeholder="free text")
+                        br
+                        br                                 
+                        .form-group.row
+                            .col-sm-1
+                                button.btn.btn-space.btn-default(type='submit') update

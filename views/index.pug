@@ -1,0 +1,11 @@
+extends layout
+
+block content
+    .panel.panel-default
+        .panel-heading Device Simulator
+        .panel-body
+            if dev
+                p this device is registered as < #{dev} >
+                p you can change the device identity by choosing connect on the device menu above and entering a known device connection string
+            else
+                p new device, please choose register on device menu above
