@@ -16,7 +16,7 @@ block content
                                 td=twin.type
                                 td=twin.name
                                 td=twin.value
-     
+
         .panel.panel-default
             .panel-heading Add Field
             .panel-body                                
@@ -34,12 +34,12 @@ block content
                         br                                 
                         .form-group.row
                             .col-sm-1
-                                button.btn.btn-space.btn-default(type='submit') +
+                                button.btn.btn-space.btn-default(type='submit') +    
 
         .panel.panel-default
-            .panel-heading Update Twin
-            .panel-body                                
-                form(action='/update_twin', method='post')
+            .panel-heading twinz
+            .panel-body        
+                form(action='/twin/update', method='post')
                     fieldset                  
                         .form-group.row
                             .col-xs-4
@@ -55,4 +55,4 @@ block content
                         br                                 
                         .form-group.row
                             .col-sm-1
-                                button.btn.btn-space.btn-default(type='submit') update
+                                button.btn.btn-space.btn-default(type='submit') update                                                                
