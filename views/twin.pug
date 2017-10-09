@@ -23,21 +23,18 @@ block content
                 form(action='/twin', method='post')
                     fieldset
                         .form-group.row
-                            .col-xs-12
-                                label Field Name
-                                input.form-control(name="name", type='text', placeholder="field name")
-                        .form-group.row                                
-                            .col-xs-12
-                                label Type
-                                input.form-control(name="type", type='text', placeholder="one of tag/property")
-                        br
-                        br                                 
-                        .form-group.row
-                            .col-sm-1
-                                button.btn.btn-space.btn-default(type='submit') +    
+                            .col-xs-4
+                                input.form-control(name="name", required type='text', placeholder="type field name")
+                            .col-xs-4
+                                select#sel1.form-control(name="type")
+                                    option Tag
+                                    |         
+                                    option Property
+                            .col-xs-2
+                                button.btn.btn-space.btn-default(type='submit') Add    
 
         .panel.panel-default
-            .panel-heading twinz
+            .panel-heading Update Reported Property
             .panel-body        
                 form(action='/twin/update', method='post')
                     fieldset                  
@@ -51,7 +48,6 @@ block content
                             .col-xs-4
                                 label Field Value
                                 input.form-control(name="value", type='text', placeholder="free text")
-                        br
                         br                                 
                         .form-group.row
                             .col-sm-1

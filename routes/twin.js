@@ -38,7 +38,7 @@ router.get('/', function (req, res, next) {
 });
 
 router.post('/', function (req, res, next) {
-    var tinArray = util.setTwinArray(req.body);
+    var twinArray = util.setTwinArray(req.body);
     res.render('twin', { title: 'Azure MQTT telemetry Simulator', deviceId: util.getDevId(), twins: twinArray });
 });
 
