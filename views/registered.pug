@@ -1,0 +1,16 @@
+extends layout
+
+block content
+    .panel.panel-default
+        .panel-heading Device Selection      
+            .panel-body
+                p This device has already been registered
+                p To change the device id, enter a different connection string below and press connect
+                hr
+                form(action='/connect', method='post')
+                    fieldset
+                        .form-group.row
+                            .col-sm-10     
+                                input.form-control(type='text', name='cs', placeholder=devcs) 
+                            .col-sm-2
+                                button.btn.btn-default(type='submit', name="action", value='connect') connect 

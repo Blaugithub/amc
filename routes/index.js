@@ -1,5 +1,5 @@
 'use strict';
-var env = require('dotenv').config();
+var os = require('os');
 var express = require('express');
 var router = express.Router();
 var jsonfile = require('jsonfile')
@@ -19,41 +19,6 @@ var deviceId = 'unknown', devcs = '', hubcs = '', client, status = '';
 var cs = { "devcs": devcs, "hubcs": hubcs }
 var myTimer, lsm = 'no telemetry started', interval = 60000;
 var sensorArray = [], twinArray = [], sysArray = [], tagArray = [], propArray = [];
-/*
-jsonfile.readFile(twinFile, function (err, obj) {
-  if (obj) {
-    twinArray = obj;
-    for (var i = 0; i < obj.length; i++) {
-      switch (obj[i].type) {
-        case 'system':
-          sysArray.push(obj[i]);
-          break;
-        case 'tag':
-          tagArray.push(obj[i]);
-          break;
-        case 'property':
-          propArray.push(obj[i]);
-          break;
-      }
-    }
-  }
-})
-
-jsonfile.readFile(sensorFile, function (err, obj) {
-  if (obj)
-    sensorArray = obj;
-})
-
-jsonfile.readFile(csFile, function (err, obj) {
-  if (obj) {
-    cs = obj;
-    devcs = cs.devcs;
-    hubcs = cs.hubcs;
-    deviceId = cs.deviceId;
-  }
-})
-*/
-
 
 // auxiliary functions
 function printResultFor(op) {
@@ -69,18 +34,22 @@ function printDeviceInfo(err, deviceInfo, res) {
   }
 }
 
-
 //routing
 router.get('/', function (req, res, next) {
   var dev = util.getDev();
+  console.log(dev)
   devcs = dev.devcs;
   hubcs = dev.hubcs;
   deviceId = dev.deviceId;
-  console.log('deviceId. ' + deviceId)
-  if (!deviceId)
-    deviceId = 'unknown'
-  
-  res.render('index', { title: 'Azure MQTT telemetry Simulator', dev: deviceId, devcs: devcs });
+
+  if (!deviceId) {
+    deviceId = os.hostname();
+    console.log('deviceId: ' + deviceId);
+    res.render('new', { title: 'Azure MQTT telemetry Simulator', dev: deviceId, devcs: devcs });
+  } else {
+    res.render('registered', { title: 'Azure MQTT telemetry Simulator', dev: deviceId, devcs: devcs });
+  }
+
 });
 
 router.get('/connect', function (req, res, next) {
@@ -88,7 +57,6 @@ router.get('/connect', function (req, res, next) {
 });
 
 router.post('/connect', function (req, res, next) {
-  console.log(req.body.cs)
   if (req.body.cs !== '') {
     devcs = req.body.cs;
     deviceId = devcs.split(';')[1].substring(9);
@@ -104,6 +72,7 @@ router.post('/connect', function (req, res, next) {
     })
   }
   status = 'connected';
+  util.setStatus({'conn': status, 'lsm': lsm})
   res.render('status', { title: 'Azure MQTT telemetry Simulator', status: status, lsm: lsm });
 });
 
@@ -112,19 +81,25 @@ router.get('/register', function (req, res, next) {
 });
 
 router.post('/register', function (req, res, next) {
-
   hubcs = req.body.cs;
   var registry = iothub.Registry.fromConnectionString(hubcs);
-  deviceId = req.body.devId;
-  var device = new iothub.Device(null);
+  if (req.body.devId)
+    console.log(req.body.devId);
+  else
+    console.log(deviceId);
+
+  var device = {
+    deviceId: deviceId
+  };
   device.deviceId = deviceId;
 
   var hubName = hubcs.substring(0, hubcs.indexOf(';'));
 
-  registry.create(device, function (err, deviceInfo, res) {
+  registry.create(device, function (err, deviceInfo, regres) {
     if (err)
       registry.get(device.deviceId, printDeviceInfo);
     if (deviceInfo) {
+      console.log('deviceInfo');
       var devKey = deviceInfo.authentication.symmetricKey.primaryKey;
       devcs = hubName + ';DeviceId=' + deviceId + ';SharedAccessKey=' + devKey;
 
@@ -133,24 +108,23 @@ router.post('/register', function (req, res, next) {
       cs['deviceId'] = deviceId;
       cs['hubcs'] = hubcs;
       //persist device connection string
-      jsonfile.writeFile(csFile, cs, function (err) {
-        if (err)
-          console.error(err);
-        else
-          console.log('connection string written to file');
-      })
+      util.setDev(cs);
+      util.setStatus({'conn': 'connected', 'lsm': lsm})
+      
+      res.render('status', { title: 'Azure MQTT telemetry Simulator', status: 'registered', lsm: lsm, deviceId: util.getDevId() });
     }
+    else
+      res.render('error', { error: err });
   });
-  res.render('status', { title: 'Azure MQTT telemetry Simulator', status: 'registered', lsm: lsm, deviceId: util.getDevId() });
 
 });
 
 router.get('/status', function (req, res, next) {
-  res.render('status', { title: 'Azure MQTT telemetry Simulator', status: status, lsm: lsm, deviceId: util.getDevId() });
+  res.render('status', { title: 'Azure MQTT telemetry Simulator', status: util.getStatus().conn, lsm: util.getStatus().lsm, deviceId: util.getDevId() });
 });
 
 router.get('/device', function (req, res, next) {
-  res.render('device', { title: 'Azure MQTT telemetry Simulator', deviceId: util.getDevId() });
+  res.render('device', { title: 'Azure MQTT telemetry Simulator', deviceId: util.getDevId() });   
 });
 
 router.get('/sensor', function (req, res, next) {

@@ -19,11 +19,11 @@ var sensorArray = [], twinArray = [], sysArray = [], tagArray = [], propArray = 
 // auxiliary functions
 function printResultFor(op) {
     return function printResult(err, res) {
-      if (err) console.log(op + ' error: ' + err.toString());
-      if (res) console.log(op + ' status: ' + res.constructor.name);
+        if (err) console.log(op + ' error: ' + err.toString());
+        if (res) console.log(op + ' status: ' + res.constructor.name);
     };
-  }
-  
+}
+
 function composeMessage() {
     var msg = {};
     for (var i = 0; i < sensorArray.length; i++)
@@ -49,7 +49,7 @@ router.post('/', function (req, res, next) {
             var client = clientFromConnectionString(devcs);
             client.open(function (err) {
                 if (err) {
-                    var msg = 'Could not connect: ' + err;
+                    res.render('error', { error: err });
                 } else {
                     // Create a message and send it to the IoT Hub at interval
                     if (req.body.interval !== '')
@@ -60,26 +60,27 @@ router.post('/', function (req, res, next) {
                         var message = new Message(data);
                         client.sendEvent(message, printResultFor('send'));
                         lsm = new Date(Date.now()).toUTCString();
-                        console.log(lsm);
-
+                        util.setStatus({ 'conn': 'sending telemetry data', 'lsm': lsm })
                     }, interval);
+                    util.setStatus({ 'conn': 'starting to transmit', 'lsm': lsm })
+                    res.render('status', { title: 'Azure MQTT telemetry Simulator', status: 'connected', deviceId: util.getDevId(), lsm: 'starting to transmit' });
                 }
             });
-            res.render('device', { title: 'Azure MQTT telemetry Simulator', deviceId: util.getDevId(), lsm: lsm });
             break;
         case 'replay':
             //implement
-            res.render('device', { title: 'Azure MQTT telemetry Simulator', deviceId: util.getDevId(), lsm: lsm });
+            res.render('status', { title: 'Azure MQTT telemetry Simulator', deviceId: util.getDevId(), lsm: lsm });
             break;
         case 'stop':
             clearInterval(myTimer);
-            res.render('device', { title: 'Azure MQTT telemetry Simulator', deviceId: util.getDevId(), lsm: lsm });
+            util.setStatus({ 'conn': 'idle', 'lsm': lsm })
+            res.render('status', { title: 'Azure MQTT telemetry Simulator', status: 'idle', deviceId: util.getDevId(), lsm: lsm });
             break;
         case 'fault':
             res.send('not implemented');
             break;
         case 'refresh':
-            res.render('device', { title: 'Azure MQTT telemetry Simulator', deviceId: util.getDevId(), lsm: lsm });
+            res.render('status', { title: 'Azure MQTT telemetry Simulator', deviceId: util.getDevId(), lsm: lsm });
             break;
     }
 });

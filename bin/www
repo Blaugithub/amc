@@ -11,10 +11,13 @@ var http = require('http');
 /**
  * Get port from environment and store in Express.
  */
-var args = process.argv.slice(3);
-console.log('myArgs: ', args[0]);
+var open = 3000;
+var args = process.argv.slice(2);
+if (args[1])
+  open = args[1];
 
-var port = normalizePort(process.env.PORT || args[0]);
+
+var port = normalizePort(process.env.PORT || open);
 app.set('port', port);
 
 /**
