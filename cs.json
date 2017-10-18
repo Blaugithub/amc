@@ -1,5 +1,0 @@
-{
-    "devcs": "HostName=lucahubs1.azure-devices.net;DeviceId=MININT-QJOCG1D;SharedAccessKey=hYCOK+7cgbGVfX8zX5QYzbZEnUb3r4XDrLs4NuByE80=",
-    "hubcs": "HostName=lucahubs1.azure-devices.net;SharedAccessKeyName=iothubowner;SharedAccessKey=Ab5a6mSnDzxvJwEvyU2O77GK6v1vrIpmPSdn1so90GU=",
-    "deviceId": "MININT-QJOCG1D"
-}

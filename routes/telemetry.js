@@ -61,7 +61,8 @@ router.post('/', function (req, res, next) {
                         client.sendEvent(message, printResultFor('send'));
                         lsm = new Date(Date.now()).toUTCString();
                         util.setStatus({ 'conn': 'sending telemetry data', 'lsm': lsm })
-                    }, interval);
+                    },
+                        interval);
                     util.setStatus({ 'conn': 'starting to transmit', 'lsm': lsm })
                     res.render('status', { title: 'Azure MQTT telemetry Simulator', status: 'connected', deviceId: util.getDevId(), lsm: 'starting to transmit' });
                 }
