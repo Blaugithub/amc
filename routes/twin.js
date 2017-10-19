@@ -31,7 +31,6 @@ function printDeviceInfo(err, deviceInfo, res) {
 }
 
 //routing
-
 router.get('/', function (req, res, next) {
     var twinArray = util.getTwinArray();
     res.render('twin', { title: 'Azure MQTT telemetry Simulator', deviceId: util.getDevId(), twins: twinArray });
@@ -43,6 +42,7 @@ router.post('/', function (req, res, next) {
 });
 
 router.post('/update', function (req, res, next) {
+    // find the type in array
     var twinArray = util.setTwinValue(req.body);
     res.render('twin', { title: 'Azure MQTT telemetry Simulator', deviceId: util.getDevId(), twins: twinArray, hubcs: hubcs });
 });

@@ -15,7 +15,7 @@ var Message = require('azure-iot-device').Message;
 var Client = require('azure-iot-device').Client;
 var Protocol = require('azure-iot-device-mqtt').Mqtt;
 
-var deviceId = 'unknown', devcs = '', hubcs = '', client, status = '';
+var deviceId = '', devcs = '', hubcs = '', client, status = '';
 var cs = { "devcs": devcs, "hubcs": hubcs }
 var myTimer, lsm = 'no telemetry started', interval = 60000;
 var sensorArray = [], twinArray = [], sysArray = [], tagArray = [], propArray = [];
@@ -57,7 +57,7 @@ router.get('/connect', function (req, res, next) {
 });
 
 router.post('/connect', function (req, res, next) {
-  if (req.body.cs !== '') {
+  if (req.body.cs !== '') { // update this device to a new identity and connection string
     devcs = req.body.cs;
     deviceId = devcs.split(';')[1].substring(9);
 
@@ -71,8 +71,7 @@ router.post('/connect', function (req, res, next) {
         console.log('connection string written to file');
     })
   }
-  status = 'connected';
-  util.setStatus({'conn': status, 'lsm': lsm})
+  util.setStatus({ 'conn': 'connected', 'lsm': lsm })
   res.render('status', { title: 'Azure MQTT telemetry Simulator', status: status, lsm: lsm });
 });
 
@@ -96,25 +95,29 @@ router.post('/register', function (req, res, next) {
   var hubName = hubcs.substring(0, hubcs.indexOf(';'));
 
   registry.create(device, function (err, deviceInfo, regres) {
-    if (err)
+    if (err) {
+      // handle registry error such as device alrady registered
       registry.get(device.deviceId, printDeviceInfo);
-    if (deviceInfo) {
-      console.log('deviceInfo');
-      var devKey = deviceInfo.authentication.symmetricKey.primaryKey;
-      devcs = hubName + ';DeviceId=' + deviceId + ';SharedAccessKey=' + devKey;
-
-      //printDeviceInfo(err, deviceInfo, res);
-      cs['devcs'] = devcs;
-      cs['deviceId'] = deviceId;
-      cs['hubcs'] = hubcs;
-      //persist device connection string
-      util.setDev(cs);
-      util.setStatus({'conn': 'connected', 'lsm': lsm})
-      
-      res.render('status', { title: 'Azure MQTT telemetry Simulator', status: 'registered', lsm: lsm, deviceId: util.getDevId() });
-    }
-    else
       res.render('error', { error: err });
+    }
+    else {
+      if (deviceInfo) {
+        var devKey = deviceInfo.authentication.symmetricKey.primaryKey;
+        devcs = hubName + ';DeviceId=' + deviceId + ';SharedAccessKey=' + devKey;
+
+        //printDeviceInfo(err, deviceInfo, res);
+        cs['devcs'] = devcs;
+        cs['deviceId'] = deviceId;
+        cs['hubcs'] = hubcs;
+        //persist device connection string
+        util.setDev(cs);
+        util.setStatus({ 'conn': 'connected', 'lsm': lsm })
+
+        res.render('status', { title: 'Azure MQTT telemetry Simulator', status: 'registered', lsm: lsm, deviceId: util.getDevId() });
+      }
+      else
+        res.render('error', { error: err });
+    }
   });
 
 });
@@ -124,7 +127,7 @@ router.get('/status', function (req, res, next) {
 });
 
 router.get('/device', function (req, res, next) {
-  res.render('device', { title: 'Azure MQTT telemetry Simulator', deviceId: util.getDevId() });   
+  res.render('device', { title: 'Azure MQTT telemetry Simulator', deviceId: util.getDevId() });
 });
 
 router.get('/sensor', function (req, res, next) {

@@ -4,18 +4,21 @@ block content
         .panel.panel-default
             .panel-heading Current Fields
             .panel-body   
-                table.table.table-condensed
-                    thead
-                        tr
-                            th Type
-                            th Name                            
-                            th Value                            
-                    tbody
-                        each twin in twins
+                if twins.length == 0
+                    p no property/tag defined for twin
+                else
+                    table.table.table-condensed
+                        thead
                             tr
-                                td=twin.type
-                                td=twin.name
-                                td=twin.value
+                                th Type
+                                th Name                            
+                                th Value                            
+                        tbody
+                            each twin in twins
+                                tr
+                                    td=twin.type
+                                    td=twin.name
+                                    td=twin.value
 
         .panel.panel-default
             .panel-heading Add Field
@@ -27,28 +30,28 @@ block content
                                 input.form-control(name="name", required type='text', placeholder="type field name")
                             .col-xs-4
                                 select#sel1.form-control(name="type")
-                                    option Tag
+                                    option tag
                                     |         
-                                    option Property
+                                    option property
                             .col-xs-2
                                 button.btn.btn-space.btn-default(type='submit') Add    
 
-        .panel.panel-default
-            .panel-heading Update Reported Property
-            .panel-body        
-                form(action='/twin/update', method='post')
-                    fieldset                  
-                        .form-group.row
-                            .col-xs-4
-                                label Field Name
-                                input.form-control(name="name", type='text', placeholder="one of 'Names' as in 'Current Fields' above")
-                            .col-xs-4
-                                label Field Type
-                                input.form-control(name="type", type='text', placeholder="tag or property")
-                            .col-xs-4
-                                label Field Value
-                                input.form-control(name="value", type='text', placeholder="free text")
-                        br                                 
-                        .form-group.row
-                            .col-sm-1
-                                button.btn.btn-space.btn-default(type='submit') update                                                                
+        if twins.length > 0
+            .panel.panel-default
+                .panel-heading Update Reported Property
+                .panel-body        
+                    form(action='/twin/update', method='post')
+                        fieldset                  
+                            .form-group.row
+                                .col-xs-4
+                                    label Field Name
+                                    select#sel1.form-control(name="name")
+                                        each twin in twins
+                                            option #{twin.name}
+                                .col-xs-4
+                                    label Field Value
+                                    input.form-control(name="value", type='text', placeholder="free text")
+                            br                                 
+                            .form-group.row
+                                .col-sm-1
+                                    button.btn.btn-space.btn-default(type='submit') update                                                                
